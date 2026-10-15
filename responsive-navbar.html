@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Responsive Navigation Bar</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f5f7f6; --surface:#ffffff; --ink:#14232b; --muted:#566a73;
+  --line:#d7e0e3; --brand:#0f5c6e; --accent:#f2b705; --accent-ink:#14232b;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1a20; --surface:#14232b; --ink:#eaf1f3; --muted:#9db1b9;
+    --line:#26404b; --brand:#6cc3d5; --accent:#f2b705; --accent-ink:#14232b;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a20; --surface:#14232b; --ink:#eaf1f3; --muted:#9db1b9;
+  --line:#26404b; --brand:#6cc3d5; --accent:#f2b705; --accent-ink:#14232b;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:20}
+
+/* ---------- Navbar ---------- */
+.site-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--surface);border-bottom:1px solid var(--line)}
+.nav{max-width:1100px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:700;font-size:1.2rem;letter-spacing:.01em}
+.logo svg{width:32px;height:32px;color:var(--brand)}
+.menu{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:6px}
+.menu a{display:block;padding:8px 14px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:600;transition:color .2s,background .2s}
+.menu a:hover{color:var(--ink);background:var(--bg)}
+.menu a[aria-current="page"]{color:var(--brand);box-shadow:inset 0 -2px 0 var(--brand);border-radius:8px 8px 0 0}
+.menu .cta{background:var(--accent);color:var(--accent-ink);margin-left:8px}
+.menu .cta:hover{background:var(--accent);color:var(--accent-ink);filter:brightness(.95)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+
+.toggle{display:none;width:44px;height:44px;padding:0;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;position:relative}
+.toggle span{position:absolute;left:11px;right:11px;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s,opacity .2s,top .3s}
+.toggle span:nth-child(1){top:14px}
+.toggle span:nth-child(2){top:21px}
+.toggle span:nth-child(3){top:28px}
+.toggle[aria-expanded="true"] span:nth-child(1){top:21px;transform:rotate(45deg)}
+.toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+.toggle[aria-expanded="true"] span:nth-child(3){top:21px;transform:rotate(-45deg)}
+
+/* Mobile layout */
+@media (max-width:760px){
+  .toggle{display:block}
+  .menu{
+    position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;
+    background:var(--surface);border-bottom:1px solid var(--line);padding:8px 20px 20px;
+    max-height:0;overflow:hidden;visibility:hidden;opacity:0;padding-top:0;padding-bottom:0;
+    transition:max-height .35s ease,opacity .25s ease,padding .35s ease,visibility 0s .35s;
+  }
+  .menu.open{max-height:80vh;visibility:visible;opacity:1;padding-top:8px;padding-bottom:20px;transition:max-height .35s ease,opacity .25s ease,padding .35s ease}
+  .menu a{padding:14px 8px;border-radius:0;border-bottom:1px solid var(--line)}
+  .menu a[aria-current="page"]{box-shadow:none;border-radius:0}
+  .menu li:last-child a{border-bottom:0}
+  .menu .cta{margin:12px 0 0;text-align:center;border-radius:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms !important;scroll-behavior:auto !important}
+}
+
+/* ---------- Demo content ---------- */
+main{max-width:1100px;margin:0 auto;padding:0 20px}
+section{padding:72px 0 24px;border-bottom:1px solid var(--line)}
+section:last-child{border-bottom:0;padding-bottom:96px}
+h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.1;margin:0 0 16px;max-width:16ch}
+h2{font-size:1.6rem;margin:0 0 8px}
+p{max-width:60ch;color:var(--muted);margin:0 0 16px}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Main">
+    <a class="logo" href="#home" aria-label="Kestrel Cycles home">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="8" cy="21" r="5.5"/><circle cx="24" cy="21" r="5.5"/>
+        <path d="M8 21l5-10h8l3 10M13 11l5 10M11 8h4"/>
+      </svg>
+      Cycles Shop
+    </a>
+
+    <button class="toggle" id="toggle" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="menu" id="menu">
+      <li><a href="#home" aria-current="page">Home</a></li>
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="#routes">Routes</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact" class="cta">Book a service</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section id="home">
+    <h1>Bikes built for your commute</h1>
+    <p>Resize the window or open this on your phone. Above 760px the menu sits in the bar; below it, the menu collapses behind the hamburger button.</p>
+  </section>
+  <section id="shop">
+    <h2>Shop</h2>
+    <p>City, gravel and folding bikes, assembled and tuned in our workshop.</p>
+  </section>
+  <section id="routes">
+    <h2>Routes</h2>
+    <p>Saturday group rides with maps for every pace, from easy loops to long climbs.</p>
+  </section>
+  <section id="about">
+    <h2>About</h2>
+    <p>A family-run shop that has been fixing and building bikes for twenty years.</p>
+  </section>
+  <section id="contact">
+    <h2>Book a service</h2>
+    <p>Pick a day and drop your bike off. Most repairs are ready within 48 hours.</p>
+  </section>
+</main>
+
+<script>
+(function(){
+  var toggle=document.getElementById('toggle');
+  var menu=document.getElementById('menu');
+  var links=menu.querySelectorAll('a');
+  var mq=window.matchMedia('(min-width: 761px)');
+
+  function setOpen(open){
+    menu.classList.toggle('open',open);
+    toggle.setAttribute('aria-expanded',String(open));
+    toggle.setAttribute('aria-label',open?'Close menu':'Open menu');
+  }
+
+  toggle.addEventListener('click',function(){
+    setOpen(toggle.getAttribute('aria-expanded')!=='true');
+  });
+
+  // Mark the clicked link as current, and close the mobile menu
+  links.forEach(function(a){
+    a.addEventListener('click',function(){
+      if(!a.classList.contains('cta')){
+        links.forEach(function(l){l.removeAttribute('aria-current');});
+        a.setAttribute('aria-current','page');
+      }
+      setOpen(false);
+    });
+  });
+
+  // Escape closes the menu and returns focus to the button
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape' && menu.classList.contains('open')){
+      setOpen(false);toggle.focus();
+    }
+  });
+
+  // Click outside closes the menu
+  document.addEventListener('click',function(e){
+    if(!menu.contains(e.target)&&!toggle.contains(e.target)) setOpen(false);
+  });
+
+  // Reset when growing to desktop width
+  mq.addEventListener('change',function(e){ if(e.matches) setOpen(false); });
+
+  // Highlight the section currently in view
+  var sections=document.querySelectorAll('main section');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          links.forEach(function(l){
+            if(l.classList.contains('cta')) return;
+            if(l.getAttribute('href')==='#'+en.target.id) l.setAttribute('aria-current','page');
+            else l.removeAttribute('aria-current');
+          });
+        }
+      });
+    },{rootMargin:'-40% 0px -55% 0px'});
+    sections.forEach(function(s){io.observe(s);});
+  }
+})();
+</script>
+</body>
+</html>
